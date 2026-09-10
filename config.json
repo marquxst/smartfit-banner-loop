@@ -1,0 +1,10 @@
+{
+  "durationSeconds": 8,
+  "transitionMs": 800,
+  "banners": [
+    { "src": "banners/banner-01.svg", "durationSeconds": 8 },
+    { "src": "banners/banner-02.svg", "durationSeconds": 8 },
+    { "src": "banners/banner-03.svg", "durationSeconds": 10 }
+  ]
+}
+
