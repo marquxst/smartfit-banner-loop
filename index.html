@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banner Loop — Academia</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; cursor: none; }
+  .stage { position: relative; width: 100vw; height: 100vh; }
+  .slide {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+    opacity: 0; transition: opacity var(--transition, 800ms) ease-in-out;
+  }
+  .slide.active { opacity: 1; }
+  .hint {
+    position: fixed; bottom: 10px; right: 16px;
+    color: rgba(255,255,255,.35); font: 12px/1 Arial, sans-serif; cursor: default;
+  }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage"></div>
+  <div class="hint">pressione F para tela cheia</div>
+
+  <script>
+    const stage = document.getElementById("stage");
+
+    async function init() {
+      const config = await fetch("config.json").then(r => r.json());
+      document.documentElement.style.setProperty("--transition", `${config.transitionMs || 800}ms`);
+
+      const slides = config.banners.map((banner) => {
+        const div = document.createElement("div");
+        div.className = "slide";
+        div.style.backgroundImage = `url('${banner.src}')`;
+        stage.appendChild(div);
+        return { el: div, duration: (banner.durationSeconds || config.durationSeconds || 8) * 1000 };
+      });
+
+      if (slides.length === 0) return;
+
+      let current = 0;
+      function show(index) {
+        slides.forEach((s, i) => s.el.classList.toggle("active", i === index));
+      }
+      function next() {
+        current = (current + 1) % slides.length;
+        show(current);
+        setTimeout(next, slides[current].duration);
+      }
+
+      show(0);
+      setTimeout(next, slides[0].duration);
+    }
+
+    // Atalho para alternar tela cheia (útil ao ligar o computador/TV na academia)
+    window.addEventListener("keydown", (e) => {
+      if (e.key.toLowerCase() === "f") {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>
+
